@@ -1,24 +1,19 @@
-以下是修正後的AR魚類介紹網頁。它解決了文字配對錯誤的問題，並移除了3D模型前方的黑色長方形旋轉動畫。
-```html
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="utf-8" />
-<title>魚類介紹 AR - 修正版</title>
+<title>魚類介紹 AR - 可調整配對</title>
 
-<!-- 引入 A-Frame 與 MindAR (影像追蹤) -->
 <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.2/dist/aframe.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
 <style>
-  /* 全局重置，確保場景滿版無邊距 */
   html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    font-family: system-ui, 'Segoe UI', 'PingFang TC', 'Helvetica Neue', sans-serif;
   }
 
   a-scene {
@@ -29,14 +24,12 @@
     height: 100%;
   }
 
-  /* 完全隱藏 MindAR 預設UI，避免干擾 */
   .mindar-ui-loading,
   .mindar-ui-error,
   .mindar-ui-scanning {
     display: none !important;
   }
 
-  /* 文字介紹框: 美觀的半透明深色底，置底置中 */
   #info-card {
     display: none;
     position: fixed;
@@ -45,7 +38,7 @@
     transform: translateX(-50%);
     width: 85%;
     max-width: 560px;
-    background: rgba(10, 20, 25, 0.85);
+    background: rgba(10, 20, 25, 0.9);
     backdrop-filter: blur(10px);
     color: #fefefe;
     padding: 18px 22px;
@@ -55,26 +48,16 @@
     z-index: 9999;
     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     border: 1px solid rgba(255,255,255,0.25);
-    transition: all 0.2s ease;
-    pointer-events: none;  /* 讓點擊穿透到AR畫面，但依然可見 */
+    pointer-events: none;
   }
 
   #info-card h2 {
     margin: 0 0 8px 0;
     font-size: 24px;
     font-weight: 600;
-    letter-spacing: 1px;
     color: #ffd966;
     border-left: 4px solid #ffaa33;
     padding-left: 12px;
-  }
-
-  #info-card p {
-    margin: 6px 0;
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    flex-wrap: wrap;
   }
 
   .info-label {
@@ -83,6 +66,8 @@
     padding: 2px 8px;
     border-radius: 24px;
     font-size: 14px;
+    display: inline-block;
+    margin-right: 8px;
   }
 
   hr {
@@ -90,25 +75,16 @@
     border-color: rgba(255,255,255,0.2);
   }
 
-  /* 適應小螢幕 */
   @media (max-width: 600px) {
-    #info-card {
-      padding: 14px 18px;
-      bottom: 16px;
-      font-size: 14px;
-    }
-    #info-card h2 {
-      font-size: 20px;
-    }
+    #info-card { padding: 14px 18px; bottom: 16px; font-size: 14px; }
+    #info-card h2 { font-size: 20px; }
   }
 </style>
 </head>
 <body>
 
-<!-- 浮動資訊面板 -->
 <div id="info-card"></div>
 
-<!-- AR 主要場景 -->
 <a-scene
   mindar-image="
     imageTargetSrc: targets.mind;
@@ -123,215 +99,131 @@
   device-orientation-permission-ui="enabled: false"
 >
 
-  <!-- 相機 (預設視角) -->
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-  <!-- ========================= -->
-  <!-- 吳郭魚 (目標索引0)       -->
-  <!-- ========================= -->
-  <a-entity mindar-image-target="targetIndex: 0" id="tilapia-entity">
-    <!-- 純粹顯示靜態圖片，移除旋轉動畫與黑色長方形！
-         改用 a-plane 或 a-image 且不帶 animation，避免預設旋轉黑塊 -->
-    <a-image
-      src="tilapia.jpg"
-      position="0 0 0"
-      width="0.9"
-      height="0.6"
-      rotation="0 0 0"
-      transparent="true"
-    ></a-image>
-    <!-- 補充說明: 不加 animation 就不會有黑色方塊在前方旋轉 -->
+  <!-- ========================================================== -->
+  <!-- 四個追蹤目標，分別對應 targetIndex 0,1,2,3                  -->
+  <!-- 注意：targetIndex 順序 = 您訓練 targets.mind 時的上傳順序    -->
+  <!-- ========================================================== -->
+
+  <!-- index 0 -->
+  <a-entity mindar-image-target="targetIndex: 0" id="target-0">
+    <a-image src="fish0.jpg" position="0 0 0" width="0.9" height="0.6" transparent="true"></a-image>
   </a-entity>
 
-  <!-- ========================= -->
-  <!-- 鮭魚 (目標索引1)         -->
-  <!-- ========================= -->
-  <a-entity mindar-image-target="targetIndex: 1" id="salmon-entity">
-    <a-image
-      src="salmon.jpg"
-      position="0 0 0"
-      width="0.9"
-      height="0.6"
-      rotation="0 0 0"
-      transparent="true"
-    ></a-image>
+  <!-- index 1 -->
+  <a-entity mindar-image-target="targetIndex: 1" id="target-1">
+    <a-image src="fish1.jpg" position="0 0 0" width="0.9" height="0.6" transparent="true"></a-image>
   </a-entity>
 
-  <!-- ========================= -->
-  <!-- 鱸魚 (目標索引2)         -->
-  <!-- ========================= -->
-  <a-entity mindar-image-target="targetIndex: 2" id="bass-entity">
-    <a-image
-      src="bass.jpg"
-      position="0 0 0"
-      width="0.9"
-      height="0.6"
-      rotation="0 0 0"
-      transparent="true"
-    ></a-image>
+  <!-- index 2 -->
+  <a-entity mindar-image-target="targetIndex: 2" id="target-2">
+    <a-image src="fish2.jpg" position="0 0 0" width="0.9" height="0.6" transparent="true"></a-image>
   </a-entity>
 
-  <!-- ========================= -->
-  <!-- 小丑魚 (目標索引3)       -->
-  <!-- ========================= -->
-  <a-entity mindar-image-target="targetIndex: 3" id="clownfish-entity">
-    <a-image
-      src="clownfish.jpg"
-      position="0 0 0"
-      width="0.9"
-      height="0.6"
-      rotation="0 0 0"
-      transparent="true"
-    ></a-image>
+  <!-- index 3 -->
+  <a-entity mindar-image-target="targetIndex: 3" id="target-3">
+    <a-image src="fish3.jpg" position="0 0 0" width="0.9" height="0.6" transparent="true"></a-image>
   </a-entity>
 
 </a-scene>
 
 <script>
   (function() {
-    // 確保 DOM 完全載入
-    window.addEventListener("load", () => {
-      const infoPanel = document.querySelector("#info-card");
-      if (!infoPanel) return;
+    // ==========================================================
+    // ★★★ 重要：請依照您訓練 targets.mind 時的圖片順序，修改這裡 ★★★
+    // ==========================================================
+    // 順序說明：
+    //   index0 對應您上傳的第1張圖卡
+    //   index1 對應您上傳的第2張圖卡
+    //   index2 對應您上傳的第3張圖卡
+    //   index3 對應您上傳的第4張圖卡
+    //
+    // 請將下方 'fishName' 改成正確的魚種，文字就會自動配對！
+    // ==========================================================
 
-      // ---------- 修正重點：建立正確的 mapping (ID -> 正確魚類資料) ----------
-      // 之前錯誤原因是 ID 與資料配對錯誤，且 targetFound 可能因為異步導致錯亂。
-      // 現在明確依照 entity 的 ID 對應正確內容。
-      
-      // 詳細魚類資訊 (依照實體ID配對)
-      const fishContentMap = {
-        "tilapia-entity": {
-          name: "吳郭魚 (台灣鯛)",
-          environment: "淡水湖泊、水庫及養殖魚塭",
-          food: "藻類、水生植物、碎屑及少量浮游動物 (雜食性)",
-          edible: "✅ 可以食用，肉質鮮美，台灣常見平民美食",
-          ecology: "成長快速，但外來種可能壓縮原生魚種棲地，需養殖管理"
-        },
-        "salmon-entity": {
-          name: "鮭魚 (三文魚)",
-          environment: "冷水海域，繁殖季溯溪至淡水河流",
-          food: "小魚、磷蝦、甲殼類及水生昆蟲",
-          edible: "✅ 頂級食用魚，富含Omega-3脂肪酸",
-          ecology: "過度捕撈及環境破壞導致部分野生族群減少，永續漁業重要"
-        },
-        "bass-entity": {
-          name: "鱸魚 (海鱸/七星鱸)",
-          environment: "海水沿岸、河口域，有時進入淡水",
-          food: "小魚、蝦蟹及甲殼類 (肉食性)",
-          edible: "✅ 肉質細嫩，適合清蒸或煮湯",
-          ecology: "中高階掠食者，調控小型魚類數量，生態平衡關鍵角色"
-        },
-        "clownfish-entity": {
-          name: "小丑魚 (尼莫)",
-          environment: "溫暖的珊瑚礁海域，與海葵共生",
-          food: "藻類、浮游生物、小型甲殼類",
-          edible: "⚠️ 不建議食用 (觀賞魚為主，且野生族群需保護)",
-          ecology: "與海葵互利共生，守護珊瑚礁健康，避免非法捕撈"
+    const indexToFish = {
+      0: {
+        name: "吳郭魚",
+        environment: "淡水湖泊、水庫及養殖魚塭",
+        food: "藻類、水生植物、碎屑 (雜食性)",
+        edible: "✅ 可以食用，肉質鮮美",
+        ecology: "成長快速，外來種可能壓縮原生魚種"
+      },
+      1: {
+        name: "鮭魚",
+        environment: "冷水海域，繁殖季溯溪至淡水河流",
+        food: "小魚、磷蝦、甲殼類",
+        edible: "✅ 頂級食用魚，富含Omega-3",
+        ecology: "過度捕撈導致野生族群減少"
+      },
+      2: {
+        name: "鱸魚",
+        environment: "海水沿岸、河口域",
+        food: "小魚、蝦蟹 (肉食性)",
+        edible: "✅ 肉質細嫩，適合清蒸",
+        ecology: "掠食者，調控小型魚類數量"
+      },
+      3: {
+        name: "小丑魚",
+        environment: "溫暖的珊瑚礁海域，與海葵共生",
+        food: "藻類、浮游生物",
+        edible: "⚠️ 不建議食用 (觀賞魚)",
+        ecology: "與海葵互利共生，保護珊瑚礁"
+      }
+    };
+
+    // 如果您 training 的順序不同，請直接調整上面的內容！
+    // 例如：若第1張圖是小丑魚、第2張是吳郭魚...就把 name 互換位置。
+    // ==========================================================
+
+    const infoPanel = document.querySelector("#info-card");
+
+    function buildInfoHTML(data) {
+      if (!data) return "<div>錯誤：找不到魚類資訊</div>";
+      return `
+        <h2>🐟 ${data.name}</h2>
+        <p><span class="info-label">🌍 生活環境</span> ${data.environment}</p>
+        <p><span class="info-label">🍽️ 食物</span> ${data.food}</p>
+        <p><span class="info-label">🍴 可食用</span> ${data.edible}</p>
+        <p><span class="info-label">🌿 生態影響</span> ${data.ecology}</p>
+        <hr>
+        <div style="font-size:13px; opacity:0.7;">✨ 掃描對應圖卡顯示介紹</div>
+      `;
+    }
+
+    // 為每個 targetIndex 綁定事件
+    for (let i = 0; i <= 3; i++) {
+      const entity = document.querySelector(`#target-${i}`);
+      if (!entity) continue;
+
+      const fishData = indexToFish[i];
+
+      const onFound = () => {
+        if (infoPanel && fishData) {
+          infoPanel.innerHTML = buildInfoHTML(fishData);
+          infoPanel.style.display = "block";
+          console.log(`辨識到 index ${i} -> ${fishData.name}`);
         }
       };
 
-      // 輔助: 建立資訊框的 HTML 結構 (統一美觀樣式)
-      function buildInfoHTML(data) {
-        if (!data) return "<div>錯誤：無法載入資訊</div>";
-        return `
-          <h2>🐟 ${data.name}</h2>
-          <p><span class="info-label">🌍 生活環境</span> ${data.environment}</p>
-          <p><span class="info-label">🍽️ 食物</span> ${data.food}</p>
-          <p><span class="info-label">🍴 可食用</span> ${data.edible}</p>
-          <p><span class="info-label">🌿 生態影響</span> ${data.ecology}</p>
-          <hr>
-          <div style="font-size:13px; opacity:0.7;">✨ 掃描對應圖卡，顯示詳細介紹</div>
-        `;
-      }
-
-      // 取得所有包含 mindar-image-target 的實體 (四個魚類實體)
-      const entities = [
-        document.querySelector("#tilapia-entity"),
-        document.querySelector("#salmon-entity"),
-        document.querySelector("#bass-entity"),
-        document.querySelector("#clownfish-entity")
-      ].filter(el => el !== null);
-
-      // 為了避免重複綁定造成多個事件同時觸發顯示混亂，先解綁再綁 (確保乾淨)
-      // 並且加上標記防止重複監聽
-      entities.forEach(entity => {
-        // 移除先前可能存在的事件 (避免開發環境重複執行造成疊加)
-        entity.removeEventListener("targetFound", entity._foundHandler);
-        entity.removeEventListener("targetLost", entity._lostHandler);
-        
-        // 建立處理函式
-        const targetId = entity.id;    // ex: tilapia-entity, salmon-entity ...
-        const fishData = fishContentMap[targetId];
-        
-        if (!fishData) {
-          console.warn(`找不到魚類資料對應 ID: ${targetId}`);
-          return;
+      const onLost = () => {
+        if (infoPanel) {
+          infoPanel.style.display = "none";
         }
-        
-        // 當 target 被發現時，更新資訊面板內容
-        const onFound = () => {
-          if (!infoPanel) return;
-          // 根據當前實體對應的正確資料產生 html
-          infoPanel.innerHTML = buildInfoHTML(fishData);
-          infoPanel.style.display = "block";
-        };
-        
-        // 當 target 遺失時，隱藏面板
-        const onLost = () => {
-          if (infoPanel) {
-            infoPanel.style.display = "none";
-            // 可選擇清空內容，但不強制，避免閃爍
-            // infoPanel.innerHTML = "";
-          }
-        };
-        
-        // 儲存 handler 引用以便將來清理 (非必要但留著)
-        entity._foundHandler = onFound;
-        entity._lostHandler = onLost;
-        
-        // 綁定事件
-        entity.addEventListener("targetFound", onFound);
-        entity.addEventListener("targetLost", onLost);
-      });
-      
-      // 額外防護: 若某些 entity 因為非同步還未生成, 使用 MutationObserver 確保?
-      // 但一般載入完成後 #tilapia-entity 等已存在，此為安全起見。
-      // 另由於 mindar-image-target 內部會觸發 targetFound，這樣修正配對完全解決文字錯置問題。
-      
-      // 處理黑色長方形問題：
-      // 原始程式碼中四個模型都帶有旋轉 animation，而且 a-image 預設白色平面在未貼圖時可能顯示黑色?
-      // 但其實 "黑色長方形旋轉" 主要是 animation="property: rotation; to:0 360 0" 加上圖片未加載時佔位符或材質顏色問題。
-      // 我們已經徹底移除了所有 animation 相關設定，並確保 a-image 直接顯示且無旋轉。
-      // 若圖檔尚未載入可能短暫顯示色塊，但不會有黑色方塊一直旋轉的狀況。
-      // 同時設置 transparent="true" 增加透明度混合，避免黑底。
-      
-      // 因原始圖片路徑為 tilapia.jpg, salmon.jpg, bass.jpg, clownfish.jpg，
-      // 若圖片不存在會顯示灰色或黑色色塊，但那是圖片缺失問題，不是黑色長方形「旋轉動畫」。
-      // 為了解決潛在的圖片遺漏，可提供備用文字提示，但屬於資源問題。
-      // 此處保障移除旋轉後，不會再有物體在眼前繞圈。
-      
-      console.log("✅ 修正完成：文字配對正確，旋轉動畫已移除，不再有黑色方塊旋轉。");
-      
-      // 如果一開始場景沒抓到任何 target，資訊框預設隱藏。
-      // 另外提供裝置相機權限的友善處理 (iOS 需要用戶互動，但mind-ar會自動請求)
-    });
+      };
+
+      entity.addEventListener("targetFound", onFound);
+      entity.addEventListener("targetLost", onLost);
+    }
+
+    console.log("✅ 已設定完成。如果文字配對錯誤，請修改 indexToFish 的順序！");
   })();
 </script>
 
-<!-- 額外小調整: 為了確保在圖片尚未載入時不顯示奇怪方塊，加上CSS確保a-image渲染正常 -->
 <style>
-  a-image {
-    /* 確保沒有任何動畫繼承 */
-    animation: none !important;
-  }
-  /* 避免任何潛在的預設旋轉 */
-  [animation] {
-    animation: none !important;
-  }
-  /* 若需要平滑顯示但絕對不要旋轉  */
-  .a-enter-vr-button, .a-orientation-modal {
-    display: none;
-  }
+  a-image { animation: none !important; }
+  [animation] { animation: none !important; }
 </style>
 
 </body>
